@@ -4,11 +4,14 @@ import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +46,6 @@ public class CXFConfiguration {
 
         // Find all beans annotated with @Providers
         List<Object> providers = new ArrayList<>(ctx.getBeansWithAnnotation(Provider.class).values());
-        providers.add(new JacksonJsonProvider());
         LOGGER.info("Registering providers: {}",  providers);
 
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
@@ -57,6 +59,20 @@ public class CXFConfiguration {
             server.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
         }
         return server;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JacksonJsonProvider jsonProvider(ObjectMapper objectMapper) {
+        JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(objectMapper);
+        return provider;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     /*REGISTRATION 1*/
