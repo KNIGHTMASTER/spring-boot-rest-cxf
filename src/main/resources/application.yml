@@ -3,11 +3,13 @@ server:
   context-path: /cxf
 
 cxf:
-#  path: /services
-#  jaxrs:
+  path: /api
+  jaxrs:
 #    component-scan: true
       client :
         classes-scan-packages : org.apache.cxf.jaxrs.swagger
+  log:
+    request : true
 
 spring:
   datasource:
@@ -22,4 +24,3 @@ spring:
             dialect : org.hibernate.dialect.MySQL5Dialect
             # Hibernate ddl auto (create, create-drop, validate, update)
             ddl-auto : validate
-
